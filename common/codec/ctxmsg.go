@@ -10,8 +10,26 @@
 
 package codec
 
-import "github.com/wenruo95/jerry/jlog"
+import (
+	"context"
+)
+
+type ContextMsgKey string
+
+var ctxKey ContextMsgKey = ContextMsgKey("ctx_msg_key")
 
 type CtxMsg interface {
-	Logger() jlog.Logger
+	Logger() Logger
+	SetLogger(logger Logger)
+}
+
+func MustCtxMsg(ctx context.Context) (context.Context, CtxMsg) {
+	ctxMsgI := ctx.Value(ctxKey)
+	if ctxMsg, ok := ctxMsgI.(CtxMsg); ok {
+		return ctx, ctxMsg
+	}
+
+	ctxMsg := NewCtxMeta()
+	newCtx := context.WithValue(ctx, ctxKey, ctxMsg)
+	return newCtx, ctxMsg
 }
