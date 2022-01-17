@@ -18,18 +18,30 @@ type ContextMsgKey string
 
 var ctxKey ContextMsgKey = ContextMsgKey("ctx_msg_key")
 
-type CtxMsg interface {
-	Logger() Logger
-	SetLogger(logger Logger)
+type Msg interface {
+	Logger() interface{}
+	SetLogger(logger interface{})
 }
 
-func MustCtxMsg(ctx context.Context) (context.Context, CtxMsg) {
-	ctxMsgI := ctx.Value(ctxKey)
-	if ctxMsg, ok := ctxMsgI.(CtxMsg); ok {
-		return ctx, ctxMsg
+func NewMsg(ctx context.Context) (context.Context, Msg) {
+	msg := newmsg()
+	newCtx := context.WithValue(ctx, ctxKey, msg)
+	msg.context = newCtx
+	return newCtx, msg
+}
+
+func EnsureMsg(ctx context.Context) (context.Context, Msg) {
+	msgI := ctx.Value(ctxKey)
+	if msg, ok := msgI.(*msg); ok {
+		return ctx, msg
 	}
 
-	ctxMsg := NewCtxMeta()
-	newCtx := context.WithValue(ctx, ctxKey, ctxMsg)
-	return newCtx, ctxMsg
+	return NewMsg(ctx)
+}
+
+func Message(ctx context.Context) Msg {
+	if msg, ok := ctx.Value(ctxKey).(*msg); ok {
+		return msg
+	}
+	return &msg{context: ctx}
 }

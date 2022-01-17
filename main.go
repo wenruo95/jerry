@@ -13,8 +13,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"os"
+
+	"github.com/wenruo95/jerry/common/log"
 )
 
 const BuildVersion string = "v0.0.1"
@@ -61,7 +62,8 @@ func checkFlagInfo() {
 
 func main() {
 	checkFlagInfo()
+	log.Register(log.DefaultTag, "debug", "./log/jerry.log")
 
-	log.Printf("[INFO] development ing...")
+	log.Info("server launch...")
 
 }

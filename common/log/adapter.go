@@ -46,77 +46,77 @@ func NewAdapter(lv string, writer Writer, deep int) *Adapter {
 }
 
 func (ad *Adapter) Trace(v ...interface{}) {
-	if ad.lv < LevelTrace {
+	if ad.lv > LevelTrace {
 		return
 	}
 	ad.Output(ad.deep+2, traceTag, fmt.Sprint(v...))
 }
 
 func (ad *Adapter) Tracef(format string, v ...interface{}) {
-	if ad.lv < LevelTrace {
+	if ad.lv > LevelTrace {
 		return
 	}
 	ad.Output(ad.deep+2, traceTag, fmt.Sprintf(format, v...))
 }
 
 func (ad *Adapter) Debug(v ...interface{}) {
-	if ad.lv < LevelDebug {
+	if ad.lv > LevelDebug {
 		return
 	}
 	ad.Output(ad.deep+2, debugTag, fmt.Sprint(v...))
 }
 
 func (ad *Adapter) Debugf(format string, v ...interface{}) {
-	if ad.lv < LevelDebug {
+	if ad.lv > LevelDebug {
 		return
 	}
 	ad.Output(ad.deep+2, debugTag, fmt.Sprintf(format, v...))
 }
 
 func (ad *Adapter) Info(v ...interface{}) {
-	if ad.lv < LevelInfo {
+	if ad.lv > LevelInfo {
 		return
 	}
 	ad.Output(ad.deep+2, infoTag, fmt.Sprint(v...))
 }
 
 func (ad *Adapter) Infof(format string, v ...interface{}) {
-	if ad.lv < LevelInfo {
+	if ad.lv > LevelInfo {
 		return
 	}
 	ad.Output(ad.deep+2, infoTag, fmt.Sprintf(format, v...))
 }
 
 func (ad *Adapter) Warn(v ...interface{}) {
-	if ad.lv < LevelWarn {
+	if ad.lv > LevelWarn {
 		return
 	}
 	ad.Output(ad.deep+2, warnTag, fmt.Sprint(v...))
 }
 
 func (ad *Adapter) Warnf(format string, v ...interface{}) {
-	if ad.lv < LevelWarn {
+	if ad.lv > LevelWarn {
 		return
 	}
 	ad.Output(ad.deep+2, warnTag, fmt.Sprintf(format, v...))
 }
 
 func (ad *Adapter) Error(v ...interface{}) {
-	if ad.lv < LevelError {
+	if ad.lv > LevelError {
 		return
 	}
 	ad.Output(ad.deep+2, errorTag, fmt.Sprint(v...))
 }
 
 func (ad *Adapter) Errorf(format string, v ...interface{}) {
-	if ad.lv < LevelError {
+	if ad.lv > LevelError {
 		return
 	}
 	ad.Output(ad.deep+2, errorTag, fmt.Sprintf(format, v...))
 }
 
 func (ad *Adapter) Fatal(v ...interface{}) {
-	if ad.lv < LevelFatal {
+	if ad.lv > LevelFatal {
 		return
 	}
 	ad.Output(ad.deep+2, fatalTag, fmt.Sprint(v...))
@@ -124,7 +124,7 @@ func (ad *Adapter) Fatal(v ...interface{}) {
 }
 
 func (ad *Adapter) Fatalf(format string, v ...interface{}) {
-	if ad.lv < LevelFatal {
+	if ad.lv > LevelFatal {
 		return
 	}
 	ad.Output(ad.deep+2, fatalTag, fmt.Sprintf(format, v...))
@@ -162,6 +162,13 @@ func (ad *Adapter) WithFields(fields ...string) Logger {
 	return adapter
 }
 
+func (ad *Adapter) WithDeep(deep int) Logger {
+	ad.mu.RLock()
+	defer ad.mu.RUnlock()
+	adapter := NewAdapter(ad.lv.String(), ad.writer, deep)
+	return adapter
+}
+
 func (ad *Adapter) Output(calldepth int, tag, s string) error {
 	now := time.Now() // get this early.
 
@@ -171,18 +178,20 @@ func (ad *Adapter) Output(calldepth int, tag, s string) error {
 		line = 0
 	}
 
-	short := file
+	var indexs []int
 	for i := len(file) - 1; i > 0; i-- {
 		if file[i] == '/' {
-			short = file[i+1:]
-			break
+			indexs = append(indexs, i)
+			if len(indexs) >= 2 {
+				break
+			}
 		}
 	}
-	file = short
+	file = file[indexs[len(indexs)-1]+1:]
 
 	year, month, day := now.Date()
 	hour, min, sec := now.Clock()
-	micro := now.Nanosecond() / 1e3
+	millsec := now.Nanosecond() / 1e6
 
 	suffix := ""
 	for i := 0; i < len(ad.fields); i = i + 2 {
@@ -193,11 +202,14 @@ func (ad *Adapter) Output(calldepth int, tag, s string) error {
 			suffix = suffix + "," + pairs
 		}
 	}
-
-	if len(tag) > 0 {
-		tag = "[" + tag + "] "
+	if len(suffix) > 0 {
+		suffix = suffix + "}"
 	}
-	_, err := fmt.Fprintf(ad.writer, "%d-%d-%d %d:%d:%d.%d %s %s:%d %s\t%s",
-		year, month, day, hour, min, sec, micro, tag, file, line, s, suffix)
-	return err
+
+	if _, err := fmt.Fprintf(ad.writer, "%d-%d-%d %d:%d:%d.%3d [%s] %s:%d %s\t%s\n",
+		year, month, day, hour, min, sec, millsec, tag, file, line, s, suffix); err != nil {
+		fmt.Printf("[ERROR] printf log error:" + err.Error())
+		return err
+	}
+	return nil
 }
