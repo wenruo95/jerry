@@ -4,7 +4,7 @@
 *   file : log.go
 *   coder: zemanzeng
 *   date : 2022-01-16 21:03:45
-*   desc :
+*   desc : log
 *
 ================================================================*/
 
@@ -65,7 +65,7 @@ func Fatalf(format string, v ...interface{}) {
 }
 
 func WithFields(fields ...string) Logger {
-	return Get(DefaultTag).WithFields(fields...)
+	return Get(DefaultLogName).WithFields(fields...)
 }
 
 func WithContextFields(ctx context.Context, fields ...string) context.Context {

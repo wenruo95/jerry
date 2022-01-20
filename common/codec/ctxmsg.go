@@ -19,8 +19,22 @@ type ContextMsgKey string
 var ctxKey ContextMsgKey = ContextMsgKey("ctx_msg_key")
 
 type Msg interface {
+	Context() context.Context
+
 	Logger() interface{}
 	SetLogger(logger interface{})
+
+	EnvId() uint32
+	SetEnvId(envid uint32)
+
+	Uin() uint64
+	SetUin(uin uint64)
+
+	AppId() uint32
+	SetAppId(appid uint32)
+
+	TraceId() string
+	SetTraceId(traceId string)
 }
 
 func NewMsg(ctx context.Context) (context.Context, Msg) {

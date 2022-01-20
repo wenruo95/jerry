@@ -21,11 +21,10 @@ func TestAvailable(t *testing.T) {
 	ErrorContext(ctx, "test error")
 	DebugContext(ctx, "test debug")
 
-	ctx2 := WithContextFields(ctx, "hello2", "world2", "test2")
+	ctx2 := WithContextFields(ctx, "hello2", "world2", "hello3", "world3", "test_pair")
 	TraceContext(ctx2, "test2 trace")
 	ErrorContext(ctx2, "test2 error")
 	DebugContext(ctx2, "test2 debug")
 
-	Get(DefaultTag).Info("hello default info")
-
+	Get(DefaultLogName).Info("hello default info")
 }

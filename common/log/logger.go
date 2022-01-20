@@ -63,7 +63,6 @@ type Logger interface {
 	SetLevel(level string)
 	GetLevel() string
 
-	WithDeep(deep int) Logger
 	WithFields(field ...string) Logger
 }
 

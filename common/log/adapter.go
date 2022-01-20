@@ -4,7 +4,7 @@
 *   file : adapter.go
 *   coder: zemanzeng
 *   date : 2022-01-16 21:09:08
-*   desc :
+*   desc : logger implements
 *
 ================================================================*/
 
@@ -32,6 +32,7 @@ type Adapter struct {
 	lv     Level
 	writer Writer
 	deep   int
+	prefix string
 	fields []string
 	mu     sync.RWMutex
 }
@@ -154,18 +155,31 @@ func (ad *Adapter) GetLevel() string {
 	return level.String()
 }
 
-func (ad *Adapter) WithFields(fields ...string) Logger {
-	ad.mu.RLock()
-	defer ad.mu.RUnlock()
-	adapter := NewAdapter(ad.lv.String(), ad.writer, ad.deep)
-	adapter.fields = append(ad.fields, fields[0:len(fields)/2*2]...)
-	return adapter
+func (ad *Adapter) SetPrefix(prefix string) {
+	ad.mu.Lock()
+	ad.prefix = prefix
+	ad.mu.Unlock()
 }
 
 func (ad *Adapter) WithDeep(deep int) Logger {
+	adapter := ad.clone()
+	adapter.deep = deep
+	return adapter
+}
+
+func (ad *Adapter) WithFields(fields ...string) Logger {
+	adapter := ad.clone()
+	adapter.fields = append(adapter.fields, fields[0:len(fields)/2*2]...)
+	return adapter
+}
+
+func (ad *Adapter) clone() *Adapter {
 	ad.mu.RLock()
 	defer ad.mu.RUnlock()
-	adapter := NewAdapter(ad.lv.String(), ad.writer, deep)
+
+	adapter := NewAdapter(ad.lv.String(), ad.writer, ad.deep)
+	adapter.fields = append(adapter.fields, ad.fields...)
+	adapter.prefix = ad.prefix
 	return adapter
 }
 
@@ -193,21 +207,30 @@ func (ad *Adapter) Output(calldepth int, tag, s string) error {
 	hour, min, sec := now.Clock()
 	millsec := now.Nanosecond() / 1e6
 
-	suffix := ""
-	for i := 0; i < len(ad.fields); i = i + 2 {
-		pairs := "\"" + ad.fields[i] + "\":\"" + ad.fields[i+1] + "\""
-		if i == 0 {
-			suffix = "{" + pairs
-		} else {
-			suffix = suffix + "," + pairs
-		}
-	}
-	if len(suffix) > 0 {
-		suffix = suffix + "}"
+	ad.mu.RLock()
+	var content string
+	if len(ad.prefix) > 0 {
+		content = ad.prefix + " " + s
+	} else {
+		content = content + s
 	}
 
-	if _, err := fmt.Fprintf(ad.writer, "%d-%d-%d %d:%d:%d.%3d [%s] %s:%d %s\t%s\n",
-		year, month, day, hour, min, sec, millsec, tag, file, line, s, suffix); err != nil {
+	var pairs string
+	for i := 0; i < len(ad.fields); i = i + 2 {
+		pair := "\"" + ad.fields[i] + "\":\"" + ad.fields[i+1] + "\""
+		if i == 0 {
+			pairs = pair
+			continue
+		}
+		pairs = pairs + ", " + pair
+	}
+	if len(pairs) > 0 {
+		content = content + "\t{" + pairs + "}"
+	}
+	ad.mu.RUnlock()
+
+	if _, err := fmt.Fprintf(ad.writer, "%04d-%02d-%02d %02d:%02d:%02d.%3d %-5s %s:%d\t%s\n",
+		year, month, day, hour, min, sec, millsec, tag, file, line, content); err != nil {
 		fmt.Printf("[ERROR] printf log error:" + err.Error())
 		return err
 	}
