@@ -62,7 +62,8 @@ func checkFlagInfo() {
 
 func main() {
 	checkFlagInfo()
-	log.Register(log.DefaultTag, "debug", "./log/jerry.log")
+	log.RegisterWithFileName(log.DefaultLogName, "debug", "./log/jerry.log")
+	defer log.Sync()
 
 	log.Info("server launch...")
 
