@@ -47,77 +47,77 @@ func NewAdapter(lv string, writer Writer, deep int) *Adapter {
 }
 
 func (ad *Adapter) Trace(v ...interface{}) {
-	if ad.lv > LevelTrace {
+	if ad.lv < LevelTrace {
 		return
 	}
 	ad.Output(ad.deep+2, traceTag, fmt.Sprint(v...))
 }
 
 func (ad *Adapter) Tracef(format string, v ...interface{}) {
-	if ad.lv > LevelTrace {
+	if ad.lv < LevelTrace {
 		return
 	}
 	ad.Output(ad.deep+2, traceTag, fmt.Sprintf(format, v...))
 }
 
 func (ad *Adapter) Debug(v ...interface{}) {
-	if ad.lv > LevelDebug {
+	if ad.lv < LevelDebug {
 		return
 	}
 	ad.Output(ad.deep+2, debugTag, fmt.Sprint(v...))
 }
 
 func (ad *Adapter) Debugf(format string, v ...interface{}) {
-	if ad.lv > LevelDebug {
+	if ad.lv < LevelDebug {
 		return
 	}
 	ad.Output(ad.deep+2, debugTag, fmt.Sprintf(format, v...))
 }
 
 func (ad *Adapter) Info(v ...interface{}) {
-	if ad.lv > LevelInfo {
+	if ad.lv < LevelInfo {
 		return
 	}
 	ad.Output(ad.deep+2, infoTag, fmt.Sprint(v...))
 }
 
 func (ad *Adapter) Infof(format string, v ...interface{}) {
-	if ad.lv > LevelInfo {
+	if ad.lv < LevelInfo {
 		return
 	}
 	ad.Output(ad.deep+2, infoTag, fmt.Sprintf(format, v...))
 }
 
 func (ad *Adapter) Warn(v ...interface{}) {
-	if ad.lv > LevelWarn {
+	if ad.lv < LevelWarn {
 		return
 	}
 	ad.Output(ad.deep+2, warnTag, fmt.Sprint(v...))
 }
 
 func (ad *Adapter) Warnf(format string, v ...interface{}) {
-	if ad.lv > LevelWarn {
+	if ad.lv < LevelWarn {
 		return
 	}
 	ad.Output(ad.deep+2, warnTag, fmt.Sprintf(format, v...))
 }
 
 func (ad *Adapter) Error(v ...interface{}) {
-	if ad.lv > LevelError {
+	if ad.lv < LevelError {
 		return
 	}
 	ad.Output(ad.deep+2, errorTag, fmt.Sprint(v...))
 }
 
 func (ad *Adapter) Errorf(format string, v ...interface{}) {
-	if ad.lv > LevelError {
+	if ad.lv < LevelError {
 		return
 	}
 	ad.Output(ad.deep+2, errorTag, fmt.Sprintf(format, v...))
 }
 
 func (ad *Adapter) Fatal(v ...interface{}) {
-	if ad.lv > LevelFatal {
+	if ad.lv < LevelFatal {
 		return
 	}
 	ad.Output(ad.deep+2, fatalTag, fmt.Sprint(v...))
@@ -125,7 +125,7 @@ func (ad *Adapter) Fatal(v ...interface{}) {
 }
 
 func (ad *Adapter) Fatalf(format string, v ...interface{}) {
-	if ad.lv > LevelFatal {
+	if ad.lv < LevelFatal {
 		return
 	}
 	ad.Output(ad.deep+2, fatalTag, fmt.Sprintf(format, v...))
