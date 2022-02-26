@@ -14,6 +14,8 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+
+	"google.golang.org/protobuf/proto"
 )
 
 func ReadBody(r *http.Request, body interface{}) error {
@@ -41,5 +43,29 @@ func WriteBody(w http.ResponseWriter, body interface{}) error {
 	if _, err := w.Write(buff); err != nil {
 		return err
 	}
+	return nil
+}
+
+func JsonBodyToPb(r *http.Request, pbData proto.Message) error {
+	if params := r.URL.Query(); len(params) > 0 {
+		paramsBuff, err := json.Marshal(params)
+		if err != nil {
+			return err
+		}
+		if err := proto.Unmarshal(paramsBuff, pbData); err != nil {
+			return err
+		}
+	}
+
+	buff, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return err
+	}
+	defer r.Body.Close()
+
+	if err := proto.Unmarshal(buff, pbData); err != nil {
+		return err
+	}
+
 	return nil
 }

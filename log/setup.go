@@ -31,16 +31,11 @@ func init() {
 	writers = make(map[string]Writer)
 	loggers = make(map[string]Logger)
 
-	RegisterWithWriter(StdLogName, LevelStrings[LevelDebug], NewWriter(os.Stdout))
 	RegisterWithWriter(DefaultLogName, LevelStrings[LevelDebug], NewWriter(os.Stdout))
 }
 
 func DefaultLogger() Logger {
 	return Get(DefaultLogName)
-}
-
-func StdLogger() Logger {
-	return Get(StdLogName)
 }
 
 func Register(name string, logger Logger) {
