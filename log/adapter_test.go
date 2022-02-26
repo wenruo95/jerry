@@ -11,15 +11,22 @@
 package log
 
 import (
+	"bytes"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestAdapterAvailable(t *testing.T) {
-	ad := NewAdapter("debug", NewWriter(os.Stdout), 0)
+	writer := bytes.NewBuffer(nil)
+
+	ad := NewAdapter("debug", NewWriter(writer), 0)
 	ad.SetPrefix("TestCase")
+
 	ad.Trace("debug level trace log")
 	ad.Tracef("level:%v tracef log", ad.GetLevel())
+	assert.Equal(t, 0, writer.Len())
 
 	ad.Debug("debug level debug log")
 	ad.Debugf("level:%v debugf log", ad.GetLevel())

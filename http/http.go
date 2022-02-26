@@ -4,11 +4,11 @@
 *   file : http.go
 *   coder: zemanzeng
 *   date : 2022-01-17 11:59:11
-*   desc :
+*   desc : http常用封装
 *
 ================================================================*/
 
-package utils
+package http
 
 import (
 	"encoding/json"

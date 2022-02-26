@@ -13,7 +13,7 @@ package log
 import (
 	"context"
 
-	"github.com/wenruo95/jerry/common/codec"
+	"github.com/wenruo95/jerry/codec"
 )
 
 func Trace(format string) {
