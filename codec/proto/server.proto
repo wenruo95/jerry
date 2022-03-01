@@ -8,7 +8,7 @@ message KeyValuePairs {
     string value = 2; 
 }
 
-message ServiceBody {
+message ServerMetaData {
     string biz_name = 1; // 业务名 :冒号分隔
     string trace_id = 2; // traceid
 
@@ -16,7 +16,7 @@ message ServiceBody {
         string name = 1; // 服务名
         string cmd  = 2; // 命令字
         string ip   = 3; // 主调IP
-        KeyValuePairs metas = 4; 
+        repeated KeyValuePairs metas = 4; 
     }
     CallerInfo caller = 3; // 主调信息
 
@@ -24,6 +24,7 @@ message ServiceBody {
         string name = 1; // 服务名
         string cmd  = 2; // 命令字
         string ip   = 3; // 被调IP
+        repeated KeyValuePairs metas = 4; 
     }
     CalleeInfo callee = 4; // 被掉信息
 }

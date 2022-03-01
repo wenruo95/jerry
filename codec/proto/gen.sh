@@ -10,6 +10,6 @@
 #
 #================================================================
 
-protoc -I=./ --go_out=./ service.proto
+protoc -I=./ --go_out=./ server.proto
 cp -r codec/proto/*.go . && \
     rm -rf codec
