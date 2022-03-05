@@ -19,6 +19,7 @@ type msg struct {
 	envid   uint32 // 0-正式环境 其余均为测试环境
 	uin     uint64 // 用户uin
 	appid   uint32 // 服务appid
+	event   string // 服务的api
 	traceid string // 请求的traceid
 }
 
@@ -63,6 +64,14 @@ func (msg *msg) AppId() uint32 {
 
 func (msg *msg) SetAppId(appid uint32) {
 	msg.appid = appid
+}
+
+func (msg *msg) Event() string {
+	return msg.event
+}
+
+func (msg *msg) SetEvent(event string) {
+	msg.event = event
 }
 
 func (msg *msg) TraceId() string {

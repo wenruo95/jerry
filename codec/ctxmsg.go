@@ -33,6 +33,9 @@ type Msg interface {
 	AppId() uint32
 	SetAppId(appid uint32)
 
+	Event() string
+	SetEvent(event string)
+
 	TraceId() string
 	SetTraceId(traceId string)
 }
