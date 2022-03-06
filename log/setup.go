@@ -65,10 +65,12 @@ func RegisterWithLogConfig(name string, cfg *LogConfig) error {
 		writer = NewWriter(os.Stdout)
 	}
 
-	if _, err := writer.Write([]byte("init logger:" + name + " succ\n")); err != nil {
-		Errorf("init logger:%s cfg:%+v error:%v", name, cfg, err)
-		return err
-	}
+	/*
+		if _, err := writer.Write([]byte("init logger:" + name + " succ\n")); err != nil {
+			Errorf("init logger:%s cfg:%+v error:%v", name, cfg, err)
+			return err
+		}
+	*/
 
 	RegisterWithWriter(name, cfg.Base.Level, writer)
 	return nil
