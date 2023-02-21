@@ -12,9 +12,10 @@ package utils
 
 import (
 	"fmt"
+	"strconv"
 )
 
-const ECInternalError = 99999
+const ECInternalEror = 99999
 
 var errorCodes = make(map[int32]string)
 
@@ -27,7 +28,7 @@ func GetCodeMsg(code int32) string {
 	if msg, exist := errorCodes[code]; exist {
 		return msg
 	}
-	return ""
+	return "unknown error code:" + strconv.FormatInt(int64(code), 10)
 }
 
 // ErrorCode 业务error封装
@@ -41,15 +42,7 @@ func (ec *ErrorCode) Error() string {
 	if len(ec.Msg) == 0 {
 		ec.Msg = GetCodeMsg(ec.Code)
 	}
-
-	s := fmt.Sprintf("code:%v", ec.Code)
-	if len(ec.Msg) > 0 {
-		s = s + " msg:" + ec.Msg
-	}
-	if len(ec.ExtMsg) > 0 {
-		s = s + " ext:" + ec.ExtMsg
-	}
-	return s
+	return fmt.Sprintf("code:%v msg:%v", ec.Code, ec.Msg)
 }
 
 func ECError(code int32, msgs ...string) error {
@@ -63,16 +56,12 @@ func ECError(code int32, msgs ...string) error {
 	return &ErrorCode{Code: code, Msg: msg, ExtMsg: extMsg}
 }
 
-func ECErrorExt(code int32, extMsg string) error {
-	return &ErrorCode{Code: code, Msg: GetCodeMsg(code), ExtMsg: extMsg}
-}
-
 func GetErrorCode(err error) int32 {
 	ec, ok := err.(*ErrorCode)
 	if ok {
 		return ec.Code
 	}
-	return ECInternalError
+	return ECInternalEror
 }
 
 func GetErrorMsg(err error) string {

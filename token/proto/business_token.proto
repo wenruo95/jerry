@@ -1,0 +1,12 @@
+syntax="proto3";
+
+package business_token;
+option go_package="business_token/proto";
+
+message BusinessToken {
+    uint32 version    = 1; // 版本号
+    uint32 secret_id  = 2; // 密钥id 根据secretid获取key做解密
+    bytes  data       = 3; // 加密信息
+    int64  ctime      = 4; // 创建时间戳 单位:秒
+    int64  expire     = 5; // 过期时间戳 单位:秒
+}

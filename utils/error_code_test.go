@@ -25,13 +25,11 @@ func Test_ErrorCodeAvailable(t *testing.T) {
 
 	arr := []int32{100, 101, 102, 103, 104, 105, 106}
 	for _, code := range arr {
-		//err := ECError(code, "", fmt.Sprintf("dididiext:%v", code))
-		err := ECErrorExt(code, fmt.Sprintf("dididiext:%v", code))
+		err := ECError(code, "", fmt.Sprintf("ext:%v", code))
 		if code2 := GetErrorCode(err); code2 != code {
 			t.Errorf("code:%v not equal:%v", code, code2)
 		}
-		t.Logf("code:%v code2:%v msg:%v ext:%v error:%v",
-			code, GetErrorCode(err), GetErrorMsg(err), GetErrorExtMsg(err), err.Error())
+		t.Logf("code:%v code2:%v msg:%v ext:%v", code, GetErrorCode(err), GetErrorMsg(err), GetErrorExtMsg(err))
 	}
 
 }
